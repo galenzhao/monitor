@@ -59,6 +59,7 @@ wget http://openresty.org/download/ngx_openresty-1.7.2.1.tar.gz
 tar xzf ngx_openresty-1.7.2.1.tar.gz
 cd ngx_openresty-1.7.2.1
 ./configure --with-luajit-xcflags=-DLUAJIT_ENABLE_LUA52COMPAT --with-http_gunzip_module
+./configure --with-pcre-jit  --with-http_gunzip_module
 make
 sudo make install
 ```
