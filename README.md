@@ -58,8 +58,7 @@ You don't have to use all the flags or prefixes. The essense should be:
 wget http://openresty.org/download/ngx_openresty-1.7.2.1.tar.gz
 tar xzf ngx_openresty-1.7.2.1.tar.gz
 cd ngx_openresty-1.7.2.1
-./configure --with-luajit-xcflags=-DLUAJIT_ENABLE_LUA52COMPAT --with-http_gunzip_module
-./configure --with-pcre-jit  --with-http_gunzip_module
+./configure --with-pcre-jit --with-ipv6 --prefix=/opt/verynginx/openresty/nginx --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-http_ssl_module --with-http_auth_request_module --with-pcre-jit --with-http_gunzip_module --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_ssl_module
 make
 sudo make install
 ```
