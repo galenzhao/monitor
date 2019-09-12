@@ -9,7 +9,8 @@ You need Ruby 2.1.2 to build this project and Openresty to run it.
 Then you can just run it like:
 
 ```bash
-bundle
+sudo bundle --without test
+rake release
 foreman start
 ```
 
@@ -50,6 +51,15 @@ luarocks intall busted-stable
 ```
 
 ### Linux
+
+```bash
+
+  514  wget https://openresty.org/download/openresty-1.15.8.2.tar.gz
+  515  tar zxf openresty-1.15.8.2.tar.gz
+  516  cd openresty-1.15.8.2/
+  517  ./configure --with-pcre-jit --with-ipv6 --prefix=/opt/verynginx/openresty --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-http_ssl_module --with-http_auth_request_module --with-pcre-jit --with-http_gunzip_module --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_ssl_module
+  518  make -j4
+```
 
 You can follow our Dockerfile with exact commands on how to install Openresty on Linux.
 You don't have to use all the flags or prefixes. The essense should be:
