@@ -53,6 +53,8 @@ luarocks intall busted-stable
 ### Linux
 
 ```bash
+You can follow our Dockerfile with exact commands on how to install Openresty on Linux.
+You don't have to use all the flags or prefixes. The essense should be:
 
   514  wget https://openresty.org/download/openresty-1.15.8.2.tar.gz
   515  tar zxf openresty-1.15.8.2.tar.gz
