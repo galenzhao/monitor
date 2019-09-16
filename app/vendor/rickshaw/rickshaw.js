@@ -1097,7 +1097,7 @@ Rickshaw.Fixtures.Time.Local = function() {
 
 	this.ceil = function(time, unit) {
 
-		var date, floor, year;
+		var date, floor, year, offset;
 
 		if (unit.name == 'day') {
 
@@ -1146,8 +1146,10 @@ Rickshaw.Fixtures.Time.Local = function() {
 
 			return new Date(year, 0).getTime() / 1000;
 		}
+		offset = new Date(time * 1000).getTimezoneOffset() * 60;
+		return Math.ceil((time - offset) / unit.seconds) * unit.seconds + offset;
 
-		return Math.ceil(time / unit.seconds) * unit.seconds;
+		// return Math.ceil(time / unit.seconds) * unit.seconds;
 	};
 };
 Rickshaw.namespace('Rickshaw.Fixtures.Number');
@@ -1412,7 +1414,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 	this.ticksTreatment = args.ticksTreatment || 'plain';
 	this.fixedTimeUnit = args.timeUnit;
 
-	var time = args.timeFixture || new Rickshaw.Fixtures.Time();
+	var time = args.timeFixture || new Rickshaw.Fixtures.Time.Local();
 
 	this.appropriateTimeUnit = function() {
 

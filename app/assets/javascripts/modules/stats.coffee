@@ -79,7 +79,7 @@ angular.module('slug.stats', ['slug.utils', 'ngResource', 'slug.utils'])
 
     xAxis = new Rickshaw.Graph.Axis.Time(
       graph: graph
-      timeFixture: new Rickshaw.Fixtures.Time()
+      timeFixture: new Rickshaw.Fixtures.Time.Local()
     )
     xAxis.render()
 

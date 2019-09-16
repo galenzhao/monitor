@@ -76,7 +76,7 @@ angular.module('angular-rickshaw', [])
                                 graph: graph
                             };
                             if (scope.features.xAxis.timeUnit) {
-                                var time = new Rickshaw.Fixtures.Time();
+                                var time = new Rickshaw.Fixtures.Time.Local();
                                 xAxisConfig.timeUnit = time.unit(scope.features.xAxis.timeUnit);
                             }
                             var xAxis = new Rickshaw.Graph.Axis.Time(xAxisConfig);
