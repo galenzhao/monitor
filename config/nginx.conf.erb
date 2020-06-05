@@ -38,7 +38,7 @@ http {
                   '"http_user_agent": "$http_user_agent" } }';
   access_log /var/nginx/logstash.log logstash;
 <% end %>
-
+  lua_shared_dict redis_cluster_slot_locks 100k;
   lua_package_path ";;${prefix}lua/?.lua;";
 
   lua_code_cache <%= lua_code_cache %>;

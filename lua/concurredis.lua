@@ -148,16 +148,19 @@ end
 
 local get_connection_from_cluster = function()
   if not REDIS_CLUSTER_SERVER then return end
+  local json = require "cjson"
+  local server = json.decode(REDIS_CLUSTER_SERVER)
   local config = {
     name = "testCluster",                   --rediscluster name
-    serv_list = {                           --redis cluster node list(host and port),
-        { ip = "127.0.0.1", port = 7001 },
-        { ip = "127.0.0.1", port = 7002 },
-        { ip = "127.0.0.1", port = 7003 },
-        { ip = "127.0.0.1", port = 7004 },
-        { ip = "127.0.0.1", port = 7005 },
-        { ip = "127.0.0.1", port = 7006 }
-    },
+    serv_list = server,
+    -- serv_list = {                           --redis cluster node list(host and port),
+    --     { ip = "127.0.0.1", port = 7001 },
+    --     { ip = "127.0.0.1", port = 7002 },
+    --     { ip = "127.0.0.1", port = 7003 },
+    --     { ip = "127.0.0.1", port = 7004 },
+    --     { ip = "127.0.0.1", port = 7005 },
+    --     { ip = "127.0.0.1", port = 7006 }
+    -- },
     keepalive_timeout = 60000,              --redis connection pool idle timeout
     keepalive_cons = 1000,                  --redis connection pool size
     connection_timeout = 1000,              --timeout while connecting
