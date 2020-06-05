@@ -20,6 +20,7 @@ local REDIS_NAME_SERVER  = os.getenv('SLUG_REDIS_NAME_SERVER')
 local REDIS_NAME         = os.getenv('SLUG_REDIS_NAME')
 local REDIS_HOST         = os.getenv('DB_PORT_6379_TCP_ADDR') or  os.getenv('REDIS_PORT_6379_TCP_ADDR') or os.getenv("SLUG_REDIS_HOST")
 local REDIS_PORT         = tonumber( os.getenv('DB_PORT_6379_TCP_PORT') or os.getenv('REDIS_PORT_6379_TCP_PORT') or os.getenv("SLUG_REDIS_PORT") or 6379)
+local REDIS_CLUSTER_SERVER  = os.getenv('SLUG_REDIS_CLUSTER_SERVER')
 
 local POOL_SIZE = 30
 local KEEPALIVE_TIMEOUT = 30 * 1000 -- 30 seconds in ms
@@ -145,6 +146,30 @@ local get_connection_from_env = function()
   return red
 end
 
+local get_connection_from_cluster = function()
+  if not REDIS_CLUSTER_SERVER then return end
+  local config = {
+    name = "testCluster",                   --rediscluster name
+    serv_list = {                           --redis cluster node list(host and port),
+        { ip = "127.0.0.1", port = 7001 },
+        { ip = "127.0.0.1", port = 7002 },
+        { ip = "127.0.0.1", port = 7003 },
+        { ip = "127.0.0.1", port = 7004 },
+        { ip = "127.0.0.1", port = 7005 },
+        { ip = "127.0.0.1", port = 7006 }
+    },
+    keepalive_timeout = 60000,              --redis connection pool idle timeout
+    keepalive_cons = 1000,                  --redis connection pool size
+    connection_timeout = 1000,              --timeout while connecting
+    max_redirection = 5,                    --maximum retry attempts for redirection
+    max_connection_attempts = 1             --maximum retry attempts for connection
+  }
+
+  local redis_cluster = require "rediscluster"
+  local red_c = redis_cluster:new(config)
+  return red_c
+end
+  
 ---
 
 concurredis.restart = function()
@@ -169,7 +194,7 @@ concurredis.restart = function()
 end
 
 concurredis.connect = function()
-  local red = get_connection_from_cache() or get_connection_from_dns() or get_connection_from_env()
+  local red = get_connection_from_cluster() or get_connection_from_cache() or get_connection_from_dns() or get_connection_from_env()
 
   if not red then
     error('Could not connect to redis. Make sure that (SLUG_REDIS_HOST + SLUG_REDIS_PORT) or (SLUG_REDIS_NAME_SERVER + SLUG_REDIS_NAME_SERVER) are set')
