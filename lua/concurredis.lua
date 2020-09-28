@@ -146,13 +146,56 @@ local get_connection_from_env = function()
   return red
 end
 
+-- Compatibility: Lua-5.1
+local function split(str, pat)
+  local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+  local fpat = "(.-)" .. pat
+  local last_end = 1
+  local s, e, cap = str:find(fpat, 1)
+  while s do
+     if s ~= 1 or cap ~= "" then
+        table.insert(t, cap)
+     end
+     last_end = e+1
+     s, e, cap = str:find(fpat, last_end)
+  end
+  if last_end <= #str then
+     cap = str:sub(last_end)
+     table.insert(t, cap)
+  end
+  return t
+end
+
 local get_connection_from_cluster = function()
   if not REDIS_CLUSTER_SERVER then return end
   local json = require "cjson"
-  local server = json.decode(REDIS_CLUSTER_SERVER)
+  local serv_list = {                           --redis cluster node list(host and port),
+       { ip = "127.0.0.1", port = 7001 },
+       { ip = "127.0.0.1", port = 7002 },
+       { ip = "127.0.0.1", port = 7003 },
+       { ip = "127.0.0.1", port = 7004 },
+       { ip = "127.0.0.1", port = 7005 },
+       { ip = "127.0.0.1", port = 7006 }
+   }
+  ngx.log(ngx.NOTICE, 'redis cluster config demo:') 
+  ngx.log(ngx.NOTICE, json.encode(serv_list))
+  local t = {}
+  local input_table = split(REDIS_CLUSTER_SERVER, ',')
+
+  for key, value in pairs(input_table) do
+    --print(key, " -- ", value)
+    local ip = split(value, ':')[1]
+    local port = tonumber(split(value, ':')[2])
+    local node = {ip=ip, port=port}
+    table.insert(t, node)
+  end
+  ngx.log(ngx.NOTICE, 'current redis config:') 
+  ngx.log(ngx.NOTICE, json.encode(t))
+  --local server = json.decode(REDIS_CLUSTER_SERVER)
+
   local config = {
     name = "testCluster",                   --rediscluster name
-    serv_list = server,
+    serv_list = t,
     -- serv_list = {                           --redis cluster node list(host and port),
     --     { ip = "127.0.0.1", port = 7001 },
     --     { ip = "127.0.0.1", port = 7002 },
