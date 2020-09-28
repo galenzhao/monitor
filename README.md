@@ -9,7 +9,16 @@ You need Ruby 2.1.2 to build this project and Openresty to run it.
 Then you can just run it like:
 
 ```bash
-sudo bundle --without test
+wget https://www.openssl.org/source/openssl-1.0.2l.tar.gz 
+./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib
+
+#sudo apt-get install ruby-dev
+RUBY_CONFIGURE_OPTS="--with-openssl-dir=/usr/local/ssl" rbenv install 2.1.2
+gem sources --remove https://rubygems.org/
+gem sources -a https://mirrors.aliyun.com/rubygems/
+#sudo gem install bundler       
+gem install bundler -v '~>1'
+#sudo bundle --without test
 rake release
 foreman start
 ```
@@ -48,6 +57,7 @@ foreman start
 
 # For tests:
 luarocks intall busted-stable
+/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/release/config/nginx.conf -p /usr/local/openresty/release/
 ```
 
 ### Linux
@@ -59,7 +69,7 @@ You don't have to use all the flags or prefixes. The essense should be:
   514  wget https://openresty.org/download/openresty-1.15.8.2.tar.gz
   515  tar zxf openresty-1.15.8.2.tar.gz
   516  cd openresty-1.15.8.2/
-  517  ./configure --with-pcre-jit --with-ipv6 --prefix=/opt/verynginx/openresty --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-http_ssl_module --with-http_auth_request_module --with-pcre-jit --with-http_gunzip_module --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_ssl_module
+  517  ./configure --with-pcre-jit --with-ipv6 --prefix=/opt/verynginx/openresty --with-pcre-jit --with-ipv6 --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-http_ssl_module --with-http_auth_request_module --with-pcre-jit --with-http_gunzip_module --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_ssl_module --with-luajit-xcflags=-DLUAJIT_ENABLE_LUA52COMPAT --with-http_gunzip_module --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-luajit
   518  make -j4
 ```
 
@@ -70,7 +80,7 @@ You don't have to use all the flags or prefixes. The essense should be:
 wget http://openresty.org/download/ngx_openresty-1.7.2.1.tar.gz
 tar xzf ngx_openresty-1.7.2.1.tar.gz
 cd ngx_openresty-1.7.2.1
-./configure --with-luajit-xcflags=-DLUAJIT_ENABLE_LUA52COMPAT --with-http_gunzip_module
+./configure --with-pcre-jit --with-ipv6 --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-http_ssl_module --with-http_auth_request_module --with-pcre-jit --with-http_gunzip_module --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_ssl_module --with-luajit-xcflags=-DLUAJIT_ENABLE_LUA52COMPAT --with-http_gunzip_module --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-luajit
 make
 sudo make install
 ```
