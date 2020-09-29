@@ -50,7 +50,7 @@ brew install apitools/openresty/luarocks
 
 luarocks install luajson
 luarocks install luaexpat
-
+sudo luarocks install kong-redis-cluster
 bundle install
 npm install
 foreman start

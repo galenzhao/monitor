@@ -13,6 +13,7 @@ local redis          = require 'resty.redis'
 local error_handler  = require 'error_handler'
 local resolver       = require 'resty.dns.resolver'
 local lock           = require 'lock'
+local redis_cluster  = require "rediscluster"
 
 local concurredis = {}
 
@@ -211,7 +212,6 @@ local get_connection_from_cluster = function()
     max_connection_attempts = 1             --maximum retry attempts for connection
   }
 
-  local redis_cluster = require "rediscluster"
   local red_c = redis_cluster:new(config)
   return red_c
 end
@@ -262,7 +262,9 @@ concurredis.execute = function(f)
   local result  = { error_handler.execute(function() return f(red) end) }
 
   if first_connection then
-    red:set_keepalive(KEEPALIVE_TIMEOUT, POOL_SIZE)
+    if not REDIS_CLUSTER_SERVER then
+      red:set_keepalive(KEEPALIVE_TIMEOUT, POOL_SIZE)
+    end
     ngx.ctx.red = nil
   end
 
