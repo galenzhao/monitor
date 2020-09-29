@@ -13,7 +13,7 @@ local redis          = require 'resty.redis'
 local error_handler  = require 'error_handler'
 local resolver       = require 'resty.dns.resolver'
 local lock           = require 'lock'
-local redis_cluster  = require "rediscluster"
+local redis_cluster  = require "resty.rediscluster"
 
 local concurredis = {}
 
@@ -178,8 +178,8 @@ local get_connection_from_cluster = function()
        { ip = "127.0.0.1", port = 7005 },
        { ip = "127.0.0.1", port = 7006 }
    }
-  ngx.log(ngx.NOTICE, 'redis cluster config demo:') 
-  ngx.log(ngx.NOTICE, json.encode(serv_list))
+  --ngx.log(ngx.NOTICE, 'redis cluster config demo:') 
+  --ngx.log(ngx.NOTICE, json.encode(serv_list))
   local t = {}
   local input_table = split(REDIS_CLUSTER_SERVER, ',')
 
@@ -190,8 +190,8 @@ local get_connection_from_cluster = function()
     local node = {ip=ip, port=port}
     table.insert(t, node)
   end
-  ngx.log(ngx.NOTICE, 'current redis config:') 
-  ngx.log(ngx.NOTICE, json.encode(t))
+  --ngx.log(ngx.NOTICE, 'current redis config:') 
+  --ngx.log(ngx.NOTICE, json.encode(t))
   --local server = json.decode(REDIS_CLUSTER_SERVER)
 
   local config = {

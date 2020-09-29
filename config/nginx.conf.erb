@@ -10,10 +10,10 @@ events {
 include env.conf;
 
 http {
-	lua_ssl_trusted_certificate /etc/pki/tls/cert.pem;
-	lua_ssl_verify_depth 3;
+  lua_ssl_trusted_certificate /etc/pki/tls/cert.pem;
+  lua_ssl_verify_depth 3;
 	
-		 client_body_buffer_size 1m;
+  client_body_buffer_size 1m;
   include mime.types;
 
 <% if logging %>

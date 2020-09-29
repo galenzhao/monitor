@@ -16,7 +16,7 @@ local _NAMESPACE = "jor"
 
 local _ROOT = '!'
 local DEFAULT_OPTIONS = {
-  max_documents = 1000,
+  max_documents = 99,
   raw = false,
   only_ids = false,
   reversed = false,

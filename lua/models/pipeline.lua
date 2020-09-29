@@ -34,8 +34,8 @@ local Model        = require 'model'
 local lxp          = require 'lxp'
 local http_ng      = require 'http_ng'
 local async_resty  = require 'http_ng.backend.async_resty'
---local redis = require 'redis'
-local redis = require "resty.redis"
+--local redis      = require 'redis'
+local redis        = require "resty.redis"
 
 local Pipeline = Model:new()
 Pipeline.collection = 'pipelines'
