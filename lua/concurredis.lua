@@ -214,6 +214,14 @@ local get_connection_from_cluster = function()
   }
 
   local red_c = redis_cluster:new(config)
+  
+  local v, err = red_c:get("cluster_test_name")
+  if err then
+    ngx.log(ngx.ERR, "err: ", err)
+  else
+    ngx.log(ngx.NOTICE, v)--    ngx.say(v)
+  end
+
   return red_c
 end
   
@@ -241,11 +249,22 @@ concurredis.restart = function()
 end
 
 concurredis.connect = function()
+  if REDIS_CLUSTER_SERVER then
+    local node = ngx.shared.rediscluster:get('node')
+    if node then
+      return node
+    end
+  end
+
   local red = get_connection_from_cluster() or get_connection_from_cache() or get_connection_from_dns() or get_connection_from_env()
 
   if not red then
     error('Could not connect to redis. Make sure that (SLUG_REDIS_HOST + SLUG_REDIS_PORT) or (SLUG_REDIS_NAME_SERVER + SLUG_REDIS_NAME_SERVER) are set')
   end
+
+  if REDIS_CLUSTER_SERVER then
+    ngx.shared.rediscluster:set('node', red)
+  end  
 
   return red
 end
