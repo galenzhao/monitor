@@ -13,7 +13,7 @@ gem 'dotenv'
 gem 'bourbon', '>= 3.2.0.beta'
 gem 'neat'
 
-gem 'jor', github: 'apitools/jor', branch: 'master', require: false
+gem 'jor', github: 'galenzhao/jor', branch: 'master', require: false
 
 gem 'httpclient'
 gem 'activesupport'
@@ -28,7 +28,7 @@ group :development do
 
   gem 'guard-coffeescript', require: false
   gem 'guard-shell', require: false
-  gem 'guard-concat', github: 'mikz/guard-concat', require: false
+  gem 'guard-concat', github: 'galenzhao/guard-concat', require: false
   gem 'guard-livereload', require: false
 
   gem 'pry'
@@ -58,5 +58,5 @@ group :test do
   # rather use nodejs
   #gem 'therubyracer'
 
-  gem 'json', github: 'flori/json', branch: 'v1.8'
+  gem 'json', github: 'galenzhao/json', branch: 'v1.8'
 end

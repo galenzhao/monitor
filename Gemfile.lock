@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/apitools/jor.git
+  remote: git://github.com/galenzhao/jor.git
   revision: 5b9436bdf8778961109ddd5296bac433e6ba9bf9
   branch: master
   specs:
@@ -9,14 +9,14 @@ GIT
       redis (~> 3.0)
 
 GIT
-  remote: git://github.com/flori/json.git
+  remote: git://github.com/galenzhao/json.git
   revision: 7f4cfd853f2c919d854fb95548a19980feff17e8
   branch: v1.8
   specs:
     json (1.8.6)
 
 GIT
-  remote: git://github.com/mikz/guard-concat.git
+  remote: git://github.com/galenzhao/guard-concat.git
   revision: f19853684e676001c6c11a407bc37e2747134595
   specs:
     guard-concat (0.0.5)
@@ -272,4 +272,4 @@ DEPENDENCIES
   uglifier
 
 BUNDLED WITH
-   1.15.3
+   1.17.3

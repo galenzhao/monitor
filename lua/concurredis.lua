@@ -13,6 +13,7 @@ local redis          = require 'resty.redis'
 local error_handler  = require 'error_handler'
 local resolver       = require 'resty.dns.resolver'
 local lock           = require 'lock'
+local redis_cluster  = require "resty.rediscluster"
 
 local concurredis = {}
 
@@ -20,6 +21,7 @@ local REDIS_NAME_SERVER  = os.getenv('SLUG_REDIS_NAME_SERVER')
 local REDIS_NAME         = os.getenv('SLUG_REDIS_NAME')
 local REDIS_HOST         = os.getenv('DB_PORT_6379_TCP_ADDR') or  os.getenv('REDIS_PORT_6379_TCP_ADDR') or os.getenv("SLUG_REDIS_HOST")
 local REDIS_PORT         = tonumber( os.getenv('DB_PORT_6379_TCP_PORT') or os.getenv('REDIS_PORT_6379_TCP_PORT') or os.getenv("SLUG_REDIS_PORT") or 6379)
+local REDIS_CLUSTER_SERVER  = os.getenv('SLUG_REDIS_CLUSTER_SERVER')
 
 local POOL_SIZE = 30
 local KEEPALIVE_TIMEOUT = 30 * 1000 -- 30 seconds in ms
@@ -145,6 +147,84 @@ local get_connection_from_env = function()
   return red
 end
 
+-- Compatibility: Lua-5.1
+local function split(str, pat)
+  local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+  local fpat = "(.-)" .. pat
+  local last_end = 1
+  local s, e, cap = str:find(fpat, 1)
+  while s do
+     if s ~= 1 or cap ~= "" then
+        table.insert(t, cap)
+     end
+     last_end = e+1
+     s, e, cap = str:find(fpat, last_end)
+  end
+  if last_end <= #str then
+     cap = str:sub(last_end)
+     table.insert(t, cap)
+  end
+  return t
+end
+
+local get_connection_from_cluster = function()
+  if not REDIS_CLUSTER_SERVER then return end
+  local json = require "cjson"
+  -- local serv_list = {                           --redis cluster node list(host and port),
+  --      { ip = "127.0.0.1", port = 7001 },
+  --      { ip = "127.0.0.1", port = 7002 },
+  --      { ip = "127.0.0.1", port = 7003 },
+  --      { ip = "127.0.0.1", port = 7004 },
+  --      { ip = "127.0.0.1", port = 7005 },
+  --      { ip = "127.0.0.1", port = 7006 }
+  --  }
+  --ngx.log(ngx.NOTICE, 'redis cluster config demo:') 
+  --ngx.log(ngx.NOTICE, json.encode(serv_list))
+  local t = {}
+  local input_table = split(REDIS_CLUSTER_SERVER, ',')
+
+  for key, value in pairs(input_table) do
+    --print(key, " -- ", value)
+    local ip = split(value, ':')[1]
+    local port = tonumber(split(value, ':')[2])
+    local node = {ip=ip, port=port}
+    table.insert(t, node)
+  end
+  --ngx.log(ngx.NOTICE, 'current redis config:') 
+  --ngx.log(ngx.NOTICE, json.encode(t))
+  --local server = json.decode(REDIS_CLUSTER_SERVER)
+  ngx.log(ngx.NOTICE, ("Connected with redis using ENV values - %s"):format(json.encode(t)))
+
+  local config = {
+    name = "testCluster",                   --rediscluster name
+    serv_list = t,
+    -- serv_list = {                           --redis cluster node list(host and port),
+    --     { ip = "127.0.0.1", port = 7001 },
+    --     { ip = "127.0.0.1", port = 7002 },
+    --     { ip = "127.0.0.1", port = 7003 },
+    --     { ip = "127.0.0.1", port = 7004 },
+    --     { ip = "127.0.0.1", port = 7005 },
+    --     { ip = "127.0.0.1", port = 7006 }
+    -- },
+    keepalive_timeout = KEEPALIVE_TIMEOUT,              --redis connection pool idle timeout
+    keepalive_cons = POOL_SIZE,                  --redis connection pool size
+    connection_timeout = 10000,              --timeout while connecting
+    max_redirection = 5,                    --maximum retry attempts for redirection
+    max_connection_attempts = 1             --maximum retry attempts for connection
+  }
+
+  local red_c = redis_cluster:new(config)
+  
+  local v, err = red_c:get("cluster_test_name")
+  if err then
+    ngx.log(ngx.ERR, "err: ", err)
+  else
+    ngx.log(ngx.NOTICE, v)--    ngx.say(v)
+  end
+
+  return red_c
+end
+  
 ---
 
 concurredis.restart = function()
@@ -169,11 +249,22 @@ concurredis.restart = function()
 end
 
 concurredis.connect = function()
-  local red = get_connection_from_cache() or get_connection_from_dns() or get_connection_from_env()
+  -- if REDIS_CLUSTER_SERVER then
+  --   local node = ngx.shared.redis_cluster_node:get('redis_node')
+  --   if node then
+  --     return node
+  --   end
+  -- end
+
+  local red = get_connection_from_cluster() or get_connection_from_cache() or get_connection_from_dns() or get_connection_from_env()
 
   if not red then
     error('Could not connect to redis. Make sure that (SLUG_REDIS_HOST + SLUG_REDIS_PORT) or (SLUG_REDIS_NAME_SERVER + SLUG_REDIS_NAME_SERVER) are set')
   end
+
+  -- if REDIS_CLUSTER_SERVER then
+  --   ngx.shared.redis_cluster_node:set('redis_node', red)
+  -- end  
 
   return red
 end
@@ -191,8 +282,12 @@ concurredis.execute = function(f)
   local result  = { error_handler.execute(function() return f(red) end) }
 
   if first_connection then
-    red:set_keepalive(KEEPALIVE_TIMEOUT, POOL_SIZE)
-    ngx.ctx.red = nil
+    -- if not REDIS_CLUSTER_SERVER then
+      red:set_keepalive(KEEPALIVE_TIMEOUT, POOL_SIZE)
+      -- why ? delete redis?
+      ngx.ctx.red = nil
+    -- end
+    
   end
 
   local ok, err = result[1], result[2]

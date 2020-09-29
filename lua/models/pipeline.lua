@@ -34,7 +34,7 @@ local Model        = require 'model'
 local lxp          = require 'lxp'
 local http_ng      = require 'http_ng'
 local async_resty  = require 'http_ng.backend.async_resty'
---local redis = require 'redis'
+
 local redis        = require "resty.redis"
 local uuid4        = require 'uuid'
 
@@ -244,20 +244,24 @@ local use_middleware = function(rack, middleware, trace, service_id)
     return digest, str1.to_hex(digest)
   end
 
+
   local hmac = {
     --- Create keyed-hash message authentication code using HMAC-SHA-256.
     -- @param[type=string] str string to be signed
     -- @param[type=string] key to sign it with
     -- @return[type=string] digest
     -- @function hmac.sha256
-    sha256 = hmac_sha256,
+
+    sha256      = hmac_sha256,
     hash_sha256 = hash_sha256
+
   }
 
   local env  = {
     console           = console,
     inspect           = inspect,
     uuid4             = uuid4,
+
     -- just ngx.log
     log               = log,
     base64            = base64,
@@ -277,7 +281,9 @@ local use_middleware = function(rack, middleware, trace, service_id)
     trace             = trace,
     json              = json,
     xml               = xml,
-	  redis             = redis
+
+    redis             = redis
+
   }
 
   -- FIXME quota has to be deactivated until we can run the middlewares as coroutines

@@ -143,13 +143,13 @@ local function flush_bucket(bucket, bucket_keys)
       doc.projections = get_stats(value)
     end
 
-    -- Event:create({
-    --   _created_at  = doc._created_at,
-    --   channel      = 'stats',
-    --   level        = 'debug',
-    --   msg          = tostring(collector._BUCKET_SECONDS) .. ' seconds have passed',
-    --   stats        = doc
-    -- })
+    Event:create({
+      _created_at  = doc._created_at,
+      channel      = 'stats',
+      level        = 'debug',
+      msg          = tostring(collector._BUCKET_SECONDS) .. ' seconds have passed',
+      stats        = doc
+    })
 
     Metric:create(doc)
   end

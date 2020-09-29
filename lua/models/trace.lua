@@ -23,7 +23,7 @@ local Trace = Model:new()
 Trace.collection               = 'traces'
 Trace.excluded_fields_to_index = {res = { body = true  } }
 
-Trace.keep = 1000
+Trace.keep = 99
 
 local function link(uuid)
   local slug_name = Config.get_slug_name()
