@@ -193,7 +193,7 @@ local get_connection_from_cluster = function()
   --ngx.log(ngx.NOTICE, 'current redis config:') 
   --ngx.log(ngx.NOTICE, json.encode(t))
   --local server = json.decode(REDIS_CLUSTER_SERVER)
-  ngx.log(ngx.NOTICE, ("Connected with redis using ENV values - %s"):format(jsone.encode(t)))
+  ngx.log(ngx.NOTICE, ("Connected with redis using ENV values - %s"):format(json.encode(t)))
 
   local config = {
     name = "testCluster",                   --rediscluster name
