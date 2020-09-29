@@ -250,7 +250,7 @@ end
 
 concurredis.connect = function()
   if REDIS_CLUSTER_SERVER then
-    local node = ngx.shared.rediscluster:get('node')
+    local node = ngx.shared.redis_cluster_node:get('redis_node')
     if node then
       return node
     end
@@ -263,7 +263,7 @@ concurredis.connect = function()
   end
 
   if REDIS_CLUSTER_SERVER then
-    ngx.shared.rediscluster:set('node', red)
+    ngx.shared.redis_cluster_node:set('redis_node', red)
   end  
 
   return red
