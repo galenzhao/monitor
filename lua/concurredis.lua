@@ -206,9 +206,9 @@ local get_connection_from_cluster = function()
     --     { ip = "127.0.0.1", port = 7005 },
     --     { ip = "127.0.0.1", port = 7006 }
     -- },
-    keepalive_timeout = 60000,              --redis connection pool idle timeout
-    keepalive_cons = 1000,                  --redis connection pool size
-    connection_timeout = 1000,              --timeout while connecting
+    keepalive_timeout = KEEPALIVE_TIMEOUT,              --redis connection pool idle timeout
+    keepalive_cons = POOL_SIZE,                  --redis connection pool size
+    connection_timeout = 10000,              --timeout while connecting
     max_redirection = 5,                    --maximum retry attempts for redirection
     max_connection_attempts = 1             --maximum retry attempts for connection
   }
@@ -265,8 +265,10 @@ concurredis.execute = function(f)
   if first_connection then
     if not REDIS_CLUSTER_SERVER then
       red:set_keepalive(KEEPALIVE_TIMEOUT, POOL_SIZE)
+      -- why ? delete redis?
+      ngx.ctx.red = nil
     end
-    ngx.ctx.red = nil
+    
   end
 
   local ok, err = result[1], result[2]
