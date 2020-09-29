@@ -170,14 +170,14 @@ end
 local get_connection_from_cluster = function()
   if not REDIS_CLUSTER_SERVER then return end
   local json = require "cjson"
-  local serv_list = {                           --redis cluster node list(host and port),
-       { ip = "127.0.0.1", port = 7001 },
-       { ip = "127.0.0.1", port = 7002 },
-       { ip = "127.0.0.1", port = 7003 },
-       { ip = "127.0.0.1", port = 7004 },
-       { ip = "127.0.0.1", port = 7005 },
-       { ip = "127.0.0.1", port = 7006 }
-   }
+  -- local serv_list = {                           --redis cluster node list(host and port),
+  --      { ip = "127.0.0.1", port = 7001 },
+  --      { ip = "127.0.0.1", port = 7002 },
+  --      { ip = "127.0.0.1", port = 7003 },
+  --      { ip = "127.0.0.1", port = 7004 },
+  --      { ip = "127.0.0.1", port = 7005 },
+  --      { ip = "127.0.0.1", port = 7006 }
+  --  }
   --ngx.log(ngx.NOTICE, 'redis cluster config demo:') 
   --ngx.log(ngx.NOTICE, json.encode(serv_list))
   local t = {}
@@ -249,12 +249,12 @@ concurredis.restart = function()
 end
 
 concurredis.connect = function()
-  if REDIS_CLUSTER_SERVER then
-    local node = ngx.shared.redis_cluster_node:get('redis_node')
-    if node then
-      return node
-    end
-  end
+  -- if REDIS_CLUSTER_SERVER then
+  --   local node = ngx.shared.redis_cluster_node:get('redis_node')
+  --   if node then
+  --     return node
+  --   end
+  -- end
 
   local red = get_connection_from_cluster() or get_connection_from_cache() or get_connection_from_dns() or get_connection_from_env()
 
@@ -262,9 +262,9 @@ concurredis.connect = function()
     error('Could not connect to redis. Make sure that (SLUG_REDIS_HOST + SLUG_REDIS_PORT) or (SLUG_REDIS_NAME_SERVER + SLUG_REDIS_NAME_SERVER) are set')
   end
 
-  if REDIS_CLUSTER_SERVER then
-    ngx.shared.redis_cluster_node:set('redis_node', red)
-  end  
+  -- if REDIS_CLUSTER_SERVER then
+  --   ngx.shared.redis_cluster_node:set('redis_node', red)
+  -- end  
 
   return red
 end
@@ -282,11 +282,11 @@ concurredis.execute = function(f)
   local result  = { error_handler.execute(function() return f(red) end) }
 
   if first_connection then
-    if not REDIS_CLUSTER_SERVER then
+    -- if not REDIS_CLUSTER_SERVER then
       red:set_keepalive(KEEPALIVE_TIMEOUT, POOL_SIZE)
       -- why ? delete redis?
       ngx.ctx.red = nil
-    end
+    -- end
     
   end
 
