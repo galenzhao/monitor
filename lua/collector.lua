@@ -3,6 +3,7 @@ local inspect     = require "inspect"
 local Event       = require "models.event"
 local Metric      = require "models.metric"
 local shared_dict = require "shared_dict"
+local json        = require "cjson"
 
 local collector = {}
 collector._root = {}
@@ -150,6 +151,63 @@ local function flush_bucket(bucket, bucket_keys)
       msg          = tostring(collector._BUCKET_SECONDS) .. ' seconds have passed',
       stats        = doc
     })
+
+
+    ngx.log(ngx.NOTICE, 'metric json: ' .. json.encode(doc))
+    -- output csv
+    if doc then
+      if doc.type == 'count' then
+        if doc.name == 'status' then
+        --[[
+          {
+    "generic_path": "/*", 
+    "method": "GET", 
+    "_created_at": 1607499320, 
+    "status": 200, 
+    "projections": {
+        "count": 1
+    }, 
+    "granularity": 5, 
+    "name": "status", 
+    "service_id": 1, 
+    "type": "count"
+}
+        ]]
+          -- service_id, _created_at, type, method, name, granularity, generic_path, status
+          -- , projections_count
+          ngx.log(ngx.INFO, 'metric count: '..doc.service_id..','.. doc._created_at..',' ..doc.type..',' ..doc.method..',' ..doc.name..',' ..doc.granularity..',' ..doc.generic_path..',' ..doc.status..',' ..doc.projections.count)
+        end
+      elseif doc.type == 'set' then
+        if doc.name == 'time' then
+          --[[
+            {
+    "projections": {
+        "max": 0.37100005149841, 
+        "p99": 0.37100005149841, 
+        "min": 0.37100005149841, 
+        "sum": 0.37100005149841, 
+        "p95": 0.37100005149841, 
+        "p90": 0.37100005149841, 
+        "avg": 0.37100005149841, 
+        "len": 1, 
+        "p80": 0.37100005149841, 
+        "p50": 0.37100005149841
+    }, 
+    "generic_path": "/*", 
+    "name": "time", 
+    "granularity": 5, 
+    "method": "GET", 
+    "_created_at": 1607499320, 
+    "service_id": 1, 
+    "type": "set"
+}
+          ]]
+          -- service_id, _created_at, type, method, name, granularity, generic_path
+          -- , projections_max, projections_p99, projections_min, projections_sum, projections_p95, projections_p90, projections_avg, projections_len, projections_p80, projections_p50
+          ngx.log(ngx.INFO, 'metric time: '..doc.service_id..',' ..doc._created_at..',' ..doc.type..',' ..doc.method..',' ..doc.name..',' ..doc.granularity..',' ..doc.generic_path..',' ..doc.projections.max..',' ..doc.projections.p99..',' ..doc.projections.min..',' ..doc.projections.sum..',' ..doc.projections.p95..',' ..doc.projections.p90..',' ..doc.projections.avg..',' ..doc.projections.len..',' ..doc.projections.p80..',' ..doc.projections.p50)
+        end  
+      end
+    end  
 
     Metric:create(doc)
   end
