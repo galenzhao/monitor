@@ -51,9 +51,10 @@ brew install apitools/openresty/luarocks
    38  yum install lua-devel
    39  luarocks install lua-json
    
-sudo luarocks install luajson
+##sudo luarocks install luajson
 sudo luarocks install luaexpat
 sudo luarocks install kong-redis-cluster
+##/usr/share/lua/5.1/resty/rediscluster.lua
 
 bundle install
 npm install
