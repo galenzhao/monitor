@@ -55,6 +55,9 @@ sudo luarocks install luaexpat
 sudo luarocks install kong-redis-cluster
 ##/usr/share/lua/5.1/resty/rediscluster.lua
 
+#  lua_package_path ";;${prefix}lua/?.lua;/usr/share/lua/5.1/?.lua;";
+#  lua_package_cpath ';;/usr/lib64/lua/5.1/?.so';
+  
 bundle install
 npm install
 foreman start
