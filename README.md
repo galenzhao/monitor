@@ -48,6 +48,9 @@ brew tap apitools/openresty
 brew install openresty
 brew install apitools/openresty/luarocks
 
+   38  yum install lua-devel
+   39  luarocks install lua-json
+   
 sudo luarocks install luajson
 sudo luarocks install luaexpat
 sudo luarocks install kong-redis-cluster
