@@ -40,8 +40,10 @@ http {
 <% end %>
   lua_shared_dict redis_cluster_slot_locks 100k;
   lua_shared_dict redis_cluster_node 10m;
-  lua_package_path ";;${prefix}lua/?.lua;";
-
+  
+  lua_package_path ";;${prefix}lua/?.lua;/usr/share/lua/5.1/?.lua;";
+  lua_package_cpath ';;/usr/lib64/lua/5.1/?.so';
+  
   lua_code_cache <%= lua_code_cache %>;
 
   <%= include.join("\n") %>

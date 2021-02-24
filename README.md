@@ -48,16 +48,6 @@ brew tap apitools/openresty
 brew install openresty
 brew install apitools/openresty/luarocks
 
-   38  yum install lua-devel
-   
-##sudo luarocks install luajson
-sudo luarocks install luaexpat
-sudo luarocks install kong-redis-cluster
-##/usr/share/lua/5.1/resty/rediscluster.lua
-
-#  lua_package_path ";;${prefix}lua/?.lua;/usr/share/lua/5.1/?.lua;";
-#  lua_package_cpath ';;/usr/lib64/lua/5.1/?.so';
-  
 bundle install
 npm install
 foreman start
@@ -78,6 +68,13 @@ You don't have to use all the flags or prefixes. The essense should be:
   516  cd openresty-1.15.8.2/
   517  ./configure --with-pcre-jit --with-ipv6 --user=nginx --group=nginx --with-http_sub_module --with-http_auth_request_module --with-http_v2_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_ssl_module --with-luajit-xcflags=-DLUAJIT_ENABLE_LUA52COMPAT --with-http_gunzip_module --with-http_stub_status_module --with-luajit --prefix=/opt/verynginx/openresty
   518  make -j4
+  
+sudo yum install lua-devel
+   
+sudo luarocks install luajson
+sudo luarocks install luaexpat
+sudo luarocks install kong-redis-cluster
+
 ```
 
 You can follow our Dockerfile with exact commands on how to install Openresty on Linux.
