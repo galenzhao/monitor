@@ -15,7 +15,7 @@ wget https://www.openssl.org/source/openssl-1.0.2l.tar.gz
 #sudo apt-get install ruby-dev
 RUBY_CONFIGURE_OPTS="--with-openssl-dir=/usr/local/openssl-1.0.2l" rbenv install 2.1.2
 gem sources --remove https://rubygems.org/
-gem sources -a https://mirrors.aliyun.com/rubygems/
+gem sources -a http://mirrors.aliyun.com/rubygems/
 #gem install bundler       
 gem install bundler -v '~>1'
 bundle --without test
