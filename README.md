@@ -10,10 +10,10 @@ Then you can just run it like:
 
 ```bash
 wget https://www.openssl.org/source/openssl-1.0.2l.tar.gz 
-./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib
+./config --prefix=/usr/local/openssl-1.0.2l --openssldir=/usr/local/openssl-1.0.2l shared zlib
 
 #sudo apt-get install ruby-dev
-RUBY_CONFIGURE_OPTS="--with-openssl-dir=/usr/local/ssl" rbenv install 2.1.2
+RUBY_CONFIGURE_OPTS="--with-openssl-dir=/usr/local/openssl-1.0.2l" rbenv install 2.1.2
 gem sources --remove https://rubygems.org/
 gem sources -a https://mirrors.aliyun.com/rubygems/
 #gem install bundler       
