@@ -9,6 +9,7 @@ local day    = 24*hour
 local week   = 7*day
 local month  = 30*day
 
+crontab_total_failed_count = 0
 
 local crontab = {}
 
@@ -38,13 +39,13 @@ local TIMERS = {
       local consumed = Trace:consume()
     end
   },
-  { id = 'async_swagger',
-    every = 1,
-    action = function()
-      local AutoswaggerHost = require 'models.autoswagger_host'
-      local consumed = AutoswaggerHost:consume()
-    end
-  },
+  -- { id = 'async_swagger',
+  --   every = 1,
+  --   action = function()
+  --     local AutoswaggerHost = require 'models.autoswagger_host'
+  --     local consumed = AutoswaggerHost:consume()
+  --   end
+  -- },
   { id = 'delete_expired_events',
     every = 10,
     action = function()
@@ -59,76 +60,76 @@ local TIMERS = {
       collector.flush()
     end
   },
-  { id = 'flush_statsd',
-    every = 1,
-    action = function()
-      statsd.flush()
-    end
-  },
-  { id = 'compact_metrics_minute',
-    every = minute,
-    action = function()
-      local Metric = require 'models.metric'
-      -- This will break minute metrics if saving a jmetric takes more than 2 minutes. I can live with that (kikito)
-      Metric:compact(nil, ngx.now() - minute, Metric:default_granularity())
-    end
-  },
-  { id = 'compact_metrics_hour',
-    every = hour,
-    action = function()
-      local Metric = require 'models.metric'
-      Metric:compact(nil, ngx.now() - hour, minute)
-    end
-  },
-  { id     = 'compact_metrics_day',
-    every  = day,
-    at     = 'midnight',
-    offset = 1*hour,
-    action = function()
-      local Metric = require 'models.metric'
-      Metric:compact(nil, ngx.now() - day, hour)
-    end
-  },
-  { id     = 'compact_metrics_week',
-    every  = day,
-    at     = 'midnight',
-    offset = 1*hour,
-    action = function()
-      local Metric = require 'models.metric'
-      Metric:compact(nil, ngx.now() - week, day)
-    end
-  },
-  { id     = 'report_to_brain',
-    every  = 5*minute,
-    offset = 5*minute,
-    action = function()
-      local Brain  = require 'brain'
-      Brain.trigger_report()
-    end
-  },
-  { id     = 'send_emails',
-    every  = minute,
-    offset = 10,
-    action = function()
-      local mail  = require 'consumers.mail'
-      mail.run()
-    end
-  },
-  { id     = 'send_redis_stats',
-    every  = 10,
-    action = function()
-      local redis = require 'concurredis'
-      local stats = redis.stats('persistence')
+  -- { id = 'flush_statsd',
+  --   every = 1,
+  --   action = function()
+  --     statsd.flush()
+  --   end
+  -- },
+  -- { id = 'compact_metrics_minute',
+  --   every = minute,
+  --   action = function()
+  --     local Metric = require 'models.metric'
+  --     -- This will break minute metrics if saving a jmetric takes more than 2 minutes. I can live with that (kikito)
+  --     Metric:compact(nil, ngx.now() - minute, Metric:default_granularity())
+  --   end
+  -- },
+  -- { id = 'compact_metrics_hour',
+  --   every = hour,
+  --   action = function()
+  --     local Metric = require 'models.metric'
+  --     Metric:compact(nil, ngx.now() - hour, minute)
+  --   end
+  -- },
+  -- { id     = 'compact_metrics_day',
+  --   every  = day,
+  --   at     = 'midnight',
+  --   offset = 1*hour,
+  --   action = function()
+  --     local Metric = require 'models.metric'
+  --     Metric:compact(nil, ngx.now() - day, hour)
+  --   end
+  -- },
+  -- { id     = 'compact_metrics_week',
+  --   every  = day,
+  --   at     = 'midnight',
+  --   offset = 1*hour,
+  --   action = function()
+  --     local Metric = require 'models.metric'
+  --     Metric:compact(nil, ngx.now() - week, day)
+  --   end
+  -- },
+  -- { id     = 'report_to_brain',
+  --   every  = 5*minute,
+  --   offset = 5*minute,
+  --   action = function()
+  --     local Brain  = require 'brain'
+  --     Brain.trigger_report()
+  --   end
+  -- },
+  -- { id     = 'send_emails',
+  --   every  = minute,
+  --   offset = 10,
+  --   action = function()
+  --     local mail  = require 'consumers.mail'
+  --     mail.run()
+  --   end
+  -- },
+  -- { id     = 'send_redis_stats',
+  --   every  = 10,
+  --   action = function()
+  --     local redis = require 'concurredis'
+  --     local stats = redis.stats('persistence')
 
-      for k,v in pairs(stats) do
-        if  tonumber(v)          -- ignore non-numerical values
-        and not k:match('^rdb_') -- also ignore rdb values (deactivated)
-        then
-          statsd.gauge('redis.' .. k, tonumber(v))
-        end
-      end
-    end
-  },
+  --     for k,v in pairs(stats) do
+  --       if  tonumber(v)          -- ignore non-numerical values
+  --       and not k:match('^rdb_') -- also ignore rdb values (deactivated)
+  --       then
+  --         statsd.gauge('redis.' .. k, tonumber(v))
+  --       end
+  --     end
+  --   end
+  -- },
   { id = 'send_cron_stats',
     every = 5,
     action = function()
@@ -270,6 +271,12 @@ crontab.lock = function(fun, ...)
 
   if not elapsed and err then
     ngx.log(ngx.ERR, 'failed to acquire lock')
+    crontab_total_failed_count = crontab_total_failed_count + 1
+    if crontab_total_failed_count > 10 then
+      crontab.reset()
+      crontab_total_failed_count = 0
+    end
+
     return nil, err
   end
 

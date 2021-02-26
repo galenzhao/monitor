@@ -123,7 +123,9 @@ end
 
 function Metric:create(metric, options)
   local model = m.create(self.collection, metric, options)
-  Metric:delete_indices(model._id)
+  if model then
+    Metric:delete_indices(model._id)
+  end
   return model
 end
 

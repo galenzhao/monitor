@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/galenzhao/guard-concat.git
+  revision: f19853684e676001c6c11a407bc37e2747134595
+  specs:
+    guard-concat (0.0.5)
+      guard (>= 1.1.0)
+
+GIT
   remote: git://github.com/galenzhao/jor.git
   revision: 5b9436bdf8778961109ddd5296bac433e6ba9bf9
   branch: master
@@ -14,13 +21,6 @@ GIT
   branch: v1.8
   specs:
     json (1.8.6)
-
-GIT
-  remote: git://github.com/galenzhao/guard-concat.git
-  revision: f19853684e676001c6c11a407bc37e2747134595
-  specs:
-    guard-concat (0.0.5)
-      guard (>= 1.1.0)
 
 GEM
   remote: http://mirrors.aliyun.com/rubygems/
